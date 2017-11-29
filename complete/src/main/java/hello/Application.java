@@ -27,6 +27,11 @@ public class Application {
 			repository.save(new Customer("David", "Palmer"));
 			repository.save(new Customer("Michelle", "Dessler"));
 
+			for (int i = 0; i < 10000; i++) {
+
+				repository.save(new Customer("Firstname "+i, "Lastname "+i));
+			}
+
 			// fetch all customers
 			log.info("Customers found with findAll():");
 			log.info("-------------------------------");

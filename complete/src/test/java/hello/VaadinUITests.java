@@ -75,7 +75,7 @@ public class VaadinUITests {
 		this.vaadinUI.init(this.vaadinRequest);
 		this.repository.save(new Customer("Josh", "Long"));
 
-		vaadinUI.listCustomers("Long");
+		vaadinUI.filter.setValue("Long");
 
 		then(getCustomersInGrid()).hasSize(1);
 		then(getCustomersInGrid().get(getCustomersInGrid().size() - 1))

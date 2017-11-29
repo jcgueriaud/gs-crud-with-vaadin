@@ -49,4 +49,20 @@ public class Customer {
 				firstName, lastName);
 	}
 
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof Customer) {
+			Customer customer = (Customer) object;
+			if ((id == null)&&(customer.getId() == null)){ return super.equals(object);}
+			return this.id.equals(customer.getId());
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		if (this.id == null) return super.hashCode();
+		return Long.hashCode(this.id);
+	}
 }
