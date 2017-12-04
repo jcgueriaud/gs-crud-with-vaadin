@@ -9,6 +9,7 @@ import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.vaadin.extension.gridscroll.GridScrollExtension;
 
 import java.util.List;
 
@@ -24,25 +25,29 @@ public class VaadinUI extends UI {
 	final TextField filter;
 
 	private final Button addNewBtn;
-	final TextField itemToSelect;
-	private final Button scrollToItemBtn;
+	final TextField scrollPositionY;
+	private final Button scrollToPosition;
+	private final Button savePosition;
 
+	private final GridScrollExtension extendedGrid;
 	@Autowired
 	public VaadinUI(CustomerRepository repo, CustomerEditor editor) {
 		this.repo = repo;
 		this.editor = editor;
 		this.grid = new Grid<>(Customer.class);
 		this.filter = new TextField();
-		itemToSelect = new TextField();
-		itemToSelect.setPlaceholder("Choose an ID");
+		scrollPositionY = new TextField();
+		scrollPositionY.setPlaceholder("Scroll Position Y");
 		this.addNewBtn = new Button("New customer", VaadinIcons.PLUS);
-		this.scrollToItemBtn = new Button("Scroll To Item");
+		this.scrollToPosition = new Button("Scroll To position");
+		this.savePosition = new Button("Save scroll position");
+		extendedGrid = new GridScrollExtension(grid);
 	}
 
 	@Override
 	protected void init(VaadinRequest request) {
 		// build layout
-		HorizontalLayout actions1 = new HorizontalLayout(itemToSelect, scrollToItemBtn);
+		HorizontalLayout actions1 = new HorizontalLayout(savePosition,scrollPositionY, scrollToPosition);
 		HorizontalLayout actions2 = new HorizontalLayout(filter, addNewBtn);
 		VerticalLayout mainLayout = new VerticalLayout(actions1,actions2, grid, editor);
 		setContent(mainLayout);
@@ -51,9 +56,6 @@ public class VaadinUI extends UI {
 		grid.setColumns("id", "firstName", "lastName");
 
 		filter.setPlaceholder("Filter by last name");
-
-		// Hook logic to components
-
 
 		// Connect selected Customer to editor or hide if none is selected
 		grid.asSingleSelect().addValueChangeListener(e -> {
@@ -89,18 +91,20 @@ public class VaadinUI extends UI {
 
 
 
-		scrollToItemBtn.addClickListener(event -> {
-			if (itemToSelect.getValue() != null) {
+		scrollToPosition.addClickListener(event -> {
+			if (scrollPositionY.getValue() != null) {
 				try {
-					Long id = Long.parseLong(itemToSelect.getValue());
-					Customer customer = repo.findById(id);
-					if (customer != null)
-						grid.select(customer); // how to scroll to the selected line ?
+					Integer scrollPos = Integer.parseInt(scrollPositionY.getValue());
+					extendedGrid.setScrollPosition(0,scrollPos);
 				} catch (NumberFormatException nfe){
 
 				}
 
 			}
+		});
+
+		savePosition.addClickListener(event -> {
+			scrollPositionY.setValue(extendedGrid.getLastYPosition()+"");
 		});
 	}
 
